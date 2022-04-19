@@ -57,11 +57,11 @@ FIRST_TEST_YEAR = {
     'SSE Composite' : 2004
 }
 
-def run_experiment(backtest, output_dir, dataset_name, rule_name, eval_measure_name, US_TBond):
+def run_experiment(backtest, output_dir, dataset_name, rule_name, eval_measure_name, risk_free):
     if eval_measure_name == 'sharpe':
         first_year = backtest.first_test_year
         last_year = backtest.dataset.index.year.max()
-        interval = US_TBond.loc[first_year:last_year]
+        interval = risk_free.loc[first_year:last_year]
         n_years = len(interval)
         risk_free_rate = ((1 + interval).prod()) ** (1.0 / n_years) - 1
         backtest.eval_measure = lambda s : sharpe_ratio(s, risk_free=risk_free_rate)
@@ -75,28 +75,34 @@ def run_experiment(backtest, output_dir, dataset_name, rule_name, eval_measure_n
         json.dump(fold_results, file_)
 
 if __name__ == '__main__':
-    _, data_dir, output_dir, n_jobs = sys.argv
-    n_jobs = int(n_jobs)
+    from argparse import ArgumentParser
+    parser = ArgumentParser()
+    parser.add_argument('-d', '--datasets-directory', dest='data_dir', type=str)
+    parser.add_argument('-o', '--output-directory', dest='output_dir', type=str)
+    parser.add_argument('-n', '--number-of-jobs', dest='n_jobs', type=int, default=1)
+    parser.add_argument('-r', '--risk-free-file', dest='risk_free_file', type=str, default='./US_TBond.csv')
+    args = parser.parse_args()
 
-    if not os.path.exists(output_dir):
-        os.mkdir(output_dir)
+    if not os.path.exists(args.output_dir):
+        os.mkdir(args.output_dir)
     
-    files = os.listdir(data_dir)
+    files = os.listdir(args.data_dir)
     datasets = {}
     for f in files:
         name = f.split('.')[0]
-        datasets[name] = pd.read_csv(f'{data_dir}/{f}', header=0, index_col=0).fillna(method='ffill')
+        datasets[name] = pd.read_csv(f'{args.data_dir}/{f}', header=0, index_col=0).fillna(method='ffill')
     
-    US_TBond = pd.read_csv('./US_TBond.csv', header=0, index_col=0)['US T. Bond']
+    risk_free = pd.read_csv(args.risk_free_file, header=0, index_col=0)
+    risk_free = risk_free[risk_free.columns[0]]
 
-    pool = mp.Pool(processes=n_jobs)
+    pool = mp.Pool(processes=args.n_jobs)
     for r_name, (constructor, grid) in TRADING_RULES.items():
         params = []
         for d_name, dataset in datasets.items():
             for e_name in EVALUATION_MEASURES:
                 eval_measure = EVALUATION_MEASURES[e_name]
                 b = Backtest(dataset, constructor, grid, eval_measure, FIRST_TEST_YEAR[d_name])
-                params.append((b, output_dir, d_name, r_name, e_name, US_TBond))
+                params.append((b, args.output_dir, d_name, r_name, e_name, risk_free))
         
         pool.starmap(run_experiment, params)
 

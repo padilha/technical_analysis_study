@@ -53,7 +53,7 @@ class Backtest(object):
 
         # Iterates from the first test year to the last one available.
         for test_year in range(self.first_test_year, max_year + 1):
-            print(test_year)
+            print(test_year, self.trading_rule)
 
             # Gets the training price series. Here we take one extra year in the beginning of the series
             # to be able to calculate the indicators for larger windows (ex: window=200). This extra year
