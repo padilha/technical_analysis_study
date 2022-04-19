@@ -1,6 +1,6 @@
 __Choose your language / escolha sua língua:__
 * [README in English](#trend-and-momentum-indicators-for-investing-in-market-indices)
-* [LEIA-ME em Português](#indicadores-técnicos-de-tendência-e-momentum-aplicados-ao-investimento-em-índices-de-mercado)
+* [LEIA-ME em Português](#indicadores-técnicos-de-tendência-e-momentum-para-o-investimento-em-índices-de-mercado)
 
 ---------------------------------------
 
