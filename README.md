@@ -75,6 +75,8 @@ conda deactivate
 
 * ```data.py``` : fetches price and volume series from Yahoo Finance.
 
+* ```env.yml``` : specifies the virtual environment for this project.
+
 * ```evaluation.py``` : evaluation measures (Sharpe ratio and Calmar ratio).
 
 * ```experiment.py``` : runs the experiment.
@@ -146,11 +148,13 @@ conda deactivate
 
 ### Descrição dos arquivos
 
-* ```US_TBond.csv``` : retornos anuais do investimento em US T. Bond (fonte: [Damodaran](https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histretSP.html)). É utilizado para cálculo do retorno do ativo livre de risco no índice Sharpe.
+* ```US_TBond.csv``` : retornos anuais do investimento em US T. Bond (fonte: [Damodaran](https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histretSP.html)). É utilizado para o cálculo do retorno do ativo livre de risco no índice Sharpe.
 
-* ```backtest.py``` : estrutura de backtesting. Realizar a otimização de parâmetros dos indicadores técnicos e simula as compras e vendas de ativos e cobrança de taxas de transação.
+* ```backtest.py``` : estrutura de backtesting. Realiza a otimização de parâmetros dos indicadores técnicos e simula as compras e vendas de ativos e cobrança de taxas de transação.
 
 * ```data.py``` : coleta as séries de preço e volume no Yahoo Finance.
+
+* ```env.yml``` : especifica o ambiente virtual para este projeto.
 
 * ```evaluation.py``` : implementa as medidas de avaliação (índices Sharpe e Calmar).
 
