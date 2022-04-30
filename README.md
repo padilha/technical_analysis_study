@@ -83,6 +83,15 @@ conda deactivate
 
 * ```rules.py``` : contains the implementation of trading rules.
 
+* ```results_default.zip```: result files of the default parameters.
+
+* ```results_optimization.zip```: result files of the parameter optimization procedure.
+
+* Each result filename follows the convention MARKET__STRATEGY__EVALUATIONMEASURE (for example DJIA__BH__calmar refers to the results of the buy-and-hold strategy on the Dow Jones Industry Average Index using the Calmar ratio). For each market-strategy-evaluation combination, there are two files:
+    * JSON file: contains the dictionary of results in the format {year : evaluation measure value}.
+
+    * CSV file: contains the resulting time series.
+
 ---------------------------------------
 
 ## Indicadores Técnicos de Tendência e Momentum para o Investimento em Índices de Mercado
@@ -161,3 +170,12 @@ conda deactivate
 * ```experiment.py``` : roda o experimento.
 
 * ```rules.py``` : contém as implementações das regras de trade.
+
+* ```results_default.zip```: arquivos de resultados para os parâmetros padrão.
+
+* ```results_optimization.zip```: arquivos de resultados para o procedimento de otimização de parâmetros.
+
+* O nome de cada arquivo de resultado segue a convenção MERCADO__ESTRATÉGIA_AVALIAÇÃO (por exemplo, DJIA__BH__calmar refere-se aos resultados da estratégia buy-and-hold no índice Dow Jones Industry Average utilizando o índice Calmar). Para cada combinação mercado-estratégia-avaliação, existem dois arquivos:
+    * Arquivo JSON: contém um dicionário de resultados no formato {ano : valor da medida de avaliação}.
+
+    * Arquivo CSV: contém a série temporal resultante.
