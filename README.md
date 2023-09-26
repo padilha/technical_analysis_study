@@ -175,7 +175,7 @@ conda deactivate
 
 * ```results_optimization.zip```: arquivos de resultados para o procedimento de otimização de parâmetros.
 
-* O nome de cada arquivo de resultado segue a convenção MERCADO__ESTRATÉGIA_AVALIAÇÃO (por exemplo, DJIA__BH__calmar refere-se aos resultados da estratégia buy-and-hold no índice Dow Jones Industry Average utilizando o índice Calmar). Para cada combinação mercado-estratégia-avaliação, existem dois arquivos:
+* O nome de cada arquivo de resultado segue a convenção MERCADO__ESTRATÉGIA__AVALIAÇÃO (por exemplo, DJIA__BH__calmar refere-se aos resultados da estratégia buy-and-hold no índice Dow Jones Industry Average utilizando o índice Calmar). Para cada combinação mercado-estratégia-avaliação, existem dois arquivos:
     * Arquivo JSON: contém um dicionário de resultados no formato {ano : valor da medida de avaliação}.
 
     * Arquivo CSV: contém a série temporal resultante.
