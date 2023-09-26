@@ -37,7 +37,13 @@ conda env create -f env.yml -n ta-study
 conda activate ta-study
 ```
 
-5. To list the available command line arguments type:
+5. Fetch the datasets from Yahoo Finance:
+
+```
+python data.py
+```
+
+6. To list the available command line arguments type:
 
 ```
 python experiment.py -h
@@ -55,13 +61,13 @@ The available options are:
 
 * ```-r``` : risk-free file path (default: ```./US_TBond.csv```).
 
-6. Example of how to run:
+7. Example of how to run:
 
 ```
 python experiment.py -d ./datasets -o ./output -n 5
 ```
 
-7. After running the codes, you can deactivate the environment.
+8. After running the codes, you can deactivate the environment.
 
 ```
 conda deactivate
@@ -127,7 +133,13 @@ conda env create -f env.yml -n ta-study
 conda activate ta-study
 ```
 
-5. Para listar os argumentos utilize este comando:
+5. Colete os datasets do Yahoo Finance:
+
+```
+python data.py
+```
+
+6. Para listar os argumentos utilize este comando:
 
 ```
 python experiment.py -h
@@ -143,13 +155,13 @@ As opções disponíveis são:
 
 * ```-n``` : número de processos para rodar os experimentos em paralelo.
 
-6. Exemplo de como rodar:
+7. Exemplo de como rodar:
 
 ```
 python experiment.py -d ./datasets -o ./output -n 5
 ```
 
-7. Após rodar os códigos, o ambiente conda pode ser desativado.
+8. Após rodar os códigos, o ambiente conda pode ser desativado.
 
 ```
 conda deactivate
