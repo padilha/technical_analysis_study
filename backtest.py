@@ -62,35 +62,38 @@ class Backtest(object):
             dataset_train = self.dataset[(self.dataset.index.year >= first_train_year - 1) &
                                          (self.dataset.index.year < test_year)]
 
-            best_params = {}
-            best_result = float('-inf')
+            param_grid = list(self.param_grid)
+            if len(param_grid) == 1:
+                best_params = param_grid[0]
+            else:
+                best_params = {}
+                best_result = float('-inf')
+                # p_train is the 'Close' slice from dataset_train that is used to select the best params.
+                # Note that it does not include the extra year that is contained in dataset_train.
+                p_train = dataset_train[dataset_train.index.year >= first_train_year]['Close']
+                for params in param_grid:
+                    # Creates a trading rule and gets its signals.
+                    rule = self.trading_rule(dataset_train, **params)
+                    signals = rule.signals()
 
-            # p_train is the 'Close' slice from dataset_train that is used to select the best params.
-            # Note that it does not include the extra year that is contained in dataset_train.
-            p_train = dataset_train[dataset_train.index.year >= first_train_year]['Close']
-            for params in self.param_grid:
-                # Creates a trading rule and gets its signals.
-                rule = self.trading_rule(dataset_train, **params)
-                signals = rule.signals()
+                    # Considers only signals for dates in p_train.index.
+                    s_train = signals[p_train.index]
 
-                # Considers only signals for dates in p_train.index.
-                s_train = signals[p_train.index]
+                    # Here we discard parameters that will not perform at least a single trade during training.
+                    zero_sum = (s_train == 0).sum()
+                    if zero_sum < len(s_train):
+                        # Runs backtest, evaluates result and check if it is the best one.
+                        output = _backtest(p_train, s_train, self.trading_fee)
+                        result = self.eval_measure(output)
 
-                # Here we discard parameters that will not perform at least a single trade during training.
-                zero_sum = (s_train == 0).sum()
-                if zero_sum < len(s_train):
-                    # Runs backtest, evaluates result and check if it is the best one.
-                    output = _backtest(p_train, s_train, self.trading_fee)
-                    result = self.eval_measure(output)
-
-                    if not math.isnan(result) and result > best_result:
-                        best_params, best_result = params, result
-            
-            if len(best_params) == 0 and not (self.trading_rule == BuyAndHold):
-                raise ValueError(
-                    'The input parameters do not generate any trading signal for the training '
-                    f'set between {first_train_year} and {test_year-1}.'
-                )
+                        if not math.isnan(result) and result > best_result:
+                            best_params, best_result = params, result
+                
+                if len(best_params) == 0 and not (self.trading_rule == BuyAndHold):
+                    raise ValueError(
+                        'The input parameters do not generate any trading signal for the training '
+                        f'set between {first_train_year} and {test_year-1}.'
+                    )
 
             # Gets the test series. Note that we take one extra year, following the same idea for
             # dataset_train above.

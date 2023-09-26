@@ -4,8 +4,6 @@ import re
 import json
 import pandas as pd
 import multiprocessing as mp
-import marshal
-import types
 
 from sklearn.model_selection import ParameterGrid
 from rules import SMA, RSI, EMA, WMA, MACD, RSI, SRSI, SO, WR, BuyAndHold
@@ -13,33 +11,55 @@ from evaluation import sharpe_ratio, calmar_ratio
 from backtest import Backtest
 
 TRADING_RULES = {
-    'SMA' : (SMA, ParameterGrid({'window' : [10, 15, 20, 25, 30, 50, 65, 80, 130, 200]})),
-    'SMA' : (SMA, ParameterGrid({'window' : [10, 15, 20, 25, 30, 50, 65, 80, 130, 200]})),
-    'WMA' : (WMA, ParameterGrid({'window' : [10, 15, 20, 25, 30, 50, 65, 80, 130, 200]})),
-    'EMA' : (EMA, ParameterGrid({'window' : [10, 15, 20, 25, 30, 50, 65, 80, 130, 200]})),
-
-    'MACD' : (MACD, ParameterGrid({'window_slow' : [10, 15, 20, 25, 30],
-                                   'window_fast' : [50, 65, 80, 130, 200],
-                                   'window_sign' : [6, 9, 12]})),
-
-    'RSI' : (RSI, ParameterGrid({'window'    : [5, 7, 9, 14, 21, 25, 28, 30, 45],
-                                 'upper_thr' : [60, 65, 70, 75, 80],
-                                 'lower_thr' : [20, 25, 30, 35, 40]})),
+    'SMA' : (
+        SMA,
+        ParameterGrid({'window' : [200]}),
+        ParameterGrid({'window' : [10, 15, 20, 25, 30, 50, 65, 80, 130, 200]})
+    ),
     
-    'SRSI' : (SRSI, ParameterGrid({'window'    : [5, 7, 9, 14, 21, 25, 28, 30, 45],
-                                   'upper_thr' : [60, 65, 70, 75, 80],
-                                   'lower_thr' : [20, 25, 30, 35, 40]})),
+    'WMA' : (
+        WMA,
+        ParameterGrid({'window' : [200]}),
+        ParameterGrid({'window' : [10, 15, 20, 25, 30, 50, 65, 80, 130, 200]})
+    ),
+
+    'EMA' : (
+        EMA,
+        ParameterGrid({'window' : [200]}),
+        ParameterGrid({'window' : [10, 15, 20, 25, 30, 50, 65, 80, 130, 200]})
+    ),
+
+    'MACD' : (
+        MACD,
+        ParameterGrid({'window_slow' : [26], 'window_fast' : [12], 'window_sign' : [9]}),
+        ParameterGrid({'window_slow' : [10, 15, 20, 25, 30], 'window_fast' : [50, 65, 80, 130, 200], 'window_sign' : [6, 9, 12]}),
+    ),
+
+    'RSI' : (
+        RSI,
+        ParameterGrid({'window' : [14], 'upper_thr' : [70], 'lower_thr' : [30]}),
+        ParameterGrid({'window' : [5, 7, 9, 14, 21, 25, 28, 30, 45], 'upper_thr' : [60, 65, 70, 75, 80], 'lower_thr' : [20, 25, 30, 35, 40]})
+    ),
     
-    'SO' : (SO, ParameterGrid({'window'    : [5, 7, 9, 14, 21, 25, 28, 30, 45],
-                               'smooth_window' : [3, 6, 9],
-                               'upper_thr' : [60, 65, 70, 75, 80],
-                               'lower_thr' : [20, 25, 30, 35, 40]})),
+    'SRSI' : (
+        SRSI,
+        ParameterGrid({'window' : [14], 'upper_thr' : [70], 'lower_thr' : [30]}),
+        ParameterGrid({'window' : [5, 7, 9, 14, 21, 25, 28, 30, 45], 'upper_thr' : [60, 65, 70, 75, 80], 'lower_thr' : [20, 25, 30, 35, 40]}),
+    ),
+    
+    'SO' : (
+        SO,
+        ParameterGrid({'window' : [14], 'smooth_window' : [3], 'upper_thr' : [80], 'lower_thr' : [20]}),
+        ParameterGrid({'window' : [5, 7, 9, 14, 21, 25, 28, 30, 45], 'smooth_window' : [3, 6, 9], 'upper_thr' : [60, 65, 70, 75, 80], 'lower_thr' : [20, 25, 30, 35, 40]}),
+    ),
 
-    'WR' : (WR, ParameterGrid({'window'    : [5, 7, 9, 14, 21, 25, 28, 30, 45],
-                               'lower_thr' : [-60, -65, -70, -75, -80],
-                               'upper_thr' : [-20, -25, -30, -35, -40]})),
+    'WR' : (
+        WR,
+        ParameterGrid({'window' : [14], 'lower_thr' : [-80], 'upper_thr' : [-20]}),
+        ParameterGrid({'window' : [5, 7, 9, 14, 21, 25, 28, 30, 45], 'lower_thr' : [-60, -65, -70, -75, -80], 'upper_thr' : [-20, -25, -30, -35, -40]}),
+    ),
 
-    'BH' : (BuyAndHold, {})
+    'BH' : (BuyAndHold, {}, {})
 }
 
 EVALUATION_MEASURES = {
@@ -54,7 +74,9 @@ FIRST_TEST_YEAR = {
     'IBOVESPA' : 2000,
     'NASDAQ' : 1978,
     'S&P 500' : 1934,
-    'SSE Composite' : 2004
+    'SSE Composite' : 2004,
+    'DXY' : 1976,
+    'Brent' : 2013
 }
 
 def run_experiment(backtest, output_dir, dataset_name, rule_name, eval_measure_name, risk_free):
@@ -81,6 +103,7 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output-directory', dest='output_dir', type=str)
     parser.add_argument('-n', '--number-of-jobs', dest='n_jobs', type=int, default=1)
     parser.add_argument('-r', '--risk-free-file', dest='risk_free_file', type=str, default='./US_TBond.csv')
+    parser.add_argument('-p', '--default-parameters', dest='default_params', action='store_true')
     args = parser.parse_args()
 
     if not os.path.exists(args.output_dir):
@@ -96,15 +119,17 @@ if __name__ == '__main__':
     risk_free = risk_free[risk_free.columns[0]]
 
     pool = mp.Pool(processes=args.n_jobs)
-    for r_name, (constructor, grid) in TRADING_RULES.items():
-        params = []
+    params = []
+    for r_name, grid in TRADING_RULES.items():
         for d_name, dataset in datasets.items():
             for e_name in EVALUATION_MEASURES:
                 eval_measure = EVALUATION_MEASURES[e_name]
-                b = Backtest(dataset, constructor, grid, eval_measure, FIRST_TEST_YEAR[d_name])
+                if args.default_params:
+                    b = Backtest(dataset, grid[0], grid[1], eval_measure, FIRST_TEST_YEAR[d_name])
+                else:
+                    b = Backtest(dataset, grid[0], grid[2], eval_measure, FIRST_TEST_YEAR[d_name])
                 params.append((b, args.output_dir, d_name, r_name, e_name, risk_free))
         
-        pool.starmap(run_experiment, params)
-
+    pool.starmap(run_experiment, params)
     pool.close()
     pool.join()
